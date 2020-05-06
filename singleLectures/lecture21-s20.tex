@@ -1,0 +1,372 @@
+\StartOf{Lecture 21}
+
+\Today{ (1) Interpolation Filtering}
+
+\announcements{
+\begin{itemize}
+  \item Homework 9 due tonight at midnight.
+  \item Exam 2 is Monday April 20.
+\end{itemize}
+}
+
+
+
+\section{Time Synchronization}
+
+The short introduction to this section is that so far in the class, we have assumed that, after the matched filter, you can simply downsample, and one of the samples will be at the correct symbol time, that is, a multiple of $T_s$ plus the time the first symbol starts arriving at the receiver.  This is generally not true, and today's digital receivers operate in an \textit{sample first, ask questions later} kind of manner.  That is, there is no analog synchronization loop that makes sure that one of the samples each symbol is at exactly the correct time.  Instead, a receiver does the determination in digital -- that is, it calculates what time the symbol should be sampled for best performance.  The receiver has a sample each multiple of $T$, the sampling period, and this calculated optimal time is not generally one of these exact sampling times.  So, the receiver then interpolates to calculate what the sample value would have been at that calculated optimal time.   This interpolation is possible because of Nyquist's sampling theorem.  It is made computationally simple using what are called Farrow filters.  This lecture is on how to perform this computationally efficient interpolation.  I've found these Farrow filters to be particularly useful in my research, and I hope to show that they're not particularly complicated.
+
+\subsection{Channel Delay Model}
+
+A radio channel adds a delay from the transmitter to the receiver, due to the fact that the two are separated in space and there is a finite speed of light (one foot per nanosecond).  In addition to that delay, the transmitter and receiver typically use asynchronous clocks that have some delay with respect to each other.
+
+At the transmitter, we send a new symbol at each multiple delay of $T_s$, the symbol period.  If we denote $a_m(k)$ as the amplitude of waveform $m$ in the $k$th symbol that is transmitted, then
+\begin{equation} \label{E:TxSignalNoDelay}
+  s(t) = \sum_k \sum_m a_m(k) \phi_m(t - kT_{s}),
+\end{equation}
+where $\{\phi_m(t)\}$ are our orthogonal waveforms, and at each time $kT_s$ we pick a new symbol to send.
+
+At the receiver, the transmitted signal arrives with a (generally unknown) delay $\tau$, and can be written (assuming carrier synchronization) as:
+\begin{equation} \label{E:RxSignalDelay}
+  x(t) = \sum_k \sum_m a_m(k) \phi_m(t - kT_{s} - \tau).
+\end{equation}
+
+As a start, let's compare receiver implementations for a continuous-time and a discrete-time receiver.  Figure
+\ref{F:AnalogReceiver} has an analog timing synchronization loop which controls the sampler (the ADC).  The symbol timing PLL in Figure \ref{F:AnalogReceiver} gets data from the signals $x(t)$ and $y(t)$ in that figure and uses it to determine, over several samples, what a good time delay $\tau$ is.
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=4in]{../images/M_Rice_Figure8_9.eps}}
+  \caption{Block diagram for a continuous-time receiver, including analog timing synchronization
+  (from Rice book, Figure 8.3.1).}
+  \label{F:AnalogReceiver}
+\end{figure}
+
+The input signal is downconverted and then run through matched
+filters, which correlate the signal with $\phi_n(t - t_k)$ for each
+$n$, and for some delay $t_k$. For the correlation with $n$,
+\begin{eqnarray} \label{E:MF_output_delay}
+  r_n(k) &=& \langle x(t), \phi_n(t) \rangle \nnn
+  r_n(k) &=& \sum_k \sum_m \mba_m(k) \langle \phi_n(t-t_k), \phi_n(t - kT_{s} -  \tau) \rangle
+\end{eqnarray}
+
+Note that if $t_k = kT_{s} + \tau$, then the correlation $\langle
+\phi_n(t-t_k), \phi_n(t - kT_{s} -  \tau) \rangle$ is highest and
+closest to 1. This $t_k$ is the correct timing delay at each
+correlator for the $k$th symbol. But, these are generally unknown to
+the receiver until timing synchronization is complete.
+
+Figure \ref{F:DigitalReceiver} shows a receiver with an ADC
+immediately after the downconverter.  Here, note the ADC has nothing
+controlling it.  Instead, after the matched filter, an interpolator
+corrects the sampling time problems using discrete-time processing.
+This interpolation is the subject of this section.
+
+\begin{figure}[htbp]
+  \centerline{\input{../images/DigitalReceiver_v3.tex}}
+  \caption{Block diagram for a digital receiver for QAM/PSK, including discrete-time timing synchronization.}
+  \label{F:DigitalReceiver}
+\end{figure}
+
+Implementations are increasingly digital.
+A `software radio' follows the idea that as much of the radio is
+done in digital, after the signal has been sampled. The idea is to
+``bring the ADC to the antenna'' for purposes of reconfigurability,
+and reducing part counts and costs.
+
+Another implementation is like Figure \ref{F:DigitalReceiver} but
+instead of the interpolator, the timing synch control block is fed
+back to the ADC.  But again, this requires a DAC and feedback to the
+analog part of the receiver, which is not preferred.  Also, because
+of the processing delay, this digital and analog feedback loop can
+be problematic.
+
+First, we'll talk about interpolation, and then, we'll consider the
+control loop.
+
+\section{Interpolation}
+
+In this lecture, we  emphasize digital timing synchronization
+using an interpolation filter.  For example, consider Figure
+\ref{F:BPSK_SamplingError}.  In this figure, a BPSK receiver samples
+the matched filter output at a rate of twice per symbol,
+unsynchronized with respect to the symbol clock, resulting in samples
+$r(nT_{})$.
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=3in]{../images/plotBPSK_SamplingError_0_3.eps} }
+  \caption{Samples of the matched filter output (BPSK, RRC with $\alpha=1$) taken at twice the correct
+  symbol rate (vertical lines), but with a timing error.  If down-sampling (by 2) results in the symbol
+  samples $r_0(k)$ given by red squares, then sampling sometimes reduces the magnitude of the desired signal.}
+  \label{F:BPSK_SamplingError}
+\end{figure}
+
+
+Some example sampling clocks, compared to the actual symbol clock,
+are shown in Figure \ref{F:PossibleSamplingTimes}.  These are shown
+in degrees of severity of correction for the receiver.  When we say
+`synchronized in rate', we mean within an integer multiple, since
+the sampling clock must operate at (at least) double the symbol
+rate.
+
+\begin{figure}[htbp]
+\centerline{
+  \includegraphics[width=4in]{../images/SamplingTimeCorrection.eps}}
+  \caption{(1) Sampling clock and (2-4) possible actual symbol clocks.  Symbol clock
+  may be (2) synchronized in rate and phase, (3) synchronized in rate but not in
+  phase,
+  (4) synchronized neither in rate nor phase; with the sample clock. }
+  \label{F:PossibleSamplingTimes}
+\end{figure}
+
+In general, our receivers always deal with type (4) sampling clock
+error as drawn in Figure \ref{F:PossibleSamplingTimes}.  That is,
+the sampling clock has  neither the same exact rate nor the same
+phase as the actual symbol clock.
+
+\Definition{Incommensurate}{Two clocks with sampling period $T_{}$ and symbol period
+$T_{s}$ are \emph{incommensurate} if the ratio $T_{}/T_{s}$ is
+irrational.  In contrast, two clocks are commensurate if the ratio
+$T_{}/T_{s}$ can be written as $n/m$ where $n, m$ are integers.}
+
+For example, $T_{}/T_{s} = 1/2$, the two clocks are commensurate
+and we sample exactly twice per symbol period.  As another example,
+if $T_{}/T_{s} = 2/5$, we sample exactly 2.5 times per symbol,
+and every 5 samples the delay until the next correct symbol sample
+will repeat.   Since clocks are generally incommensurate, we cannot
+count on them ever repeating exactly.
+
+The situation shown in Figure \ref{F:BPSK_SamplingError} is case
+(3), where $T/T_{s} = 1/2$ (the clocks are commensurate), but
+the sampling clock does not have the correct phase ($\tau$ is not
+equal to an integer multiple of $T$).
+
+\subsection{Sampling Time Notation}
+
+In general, for both cases (3) and (4) in Figure
+\ref{F:PossibleSamplingTimes}, the correct sampling times should be
+$kT_{s} + \tau^*$, but no samples were taken at those instants.
+Instead, $kT_{s} + \tau$ is always $\mu(k) T_{}$ after the most
+recent sampling instant, where $\mu(k)$ is called the
+\emph{fractional interval}. We can write that
+\begin{equation}
+  kT_{s} + \tau = [m(k) + \mu(k)] T_{}
+\end{equation}
+where $m(k)$ is an integer, the highest integer such that $nT_{} <
+kT_{s} + \tau$, and $0 \le \mu(k) < 1$.  In other words,
+\[
+  m(k) = \left\lfloor \frac{kT_{s} + \tau}{T_{}} \right\rfloor
+\]
+where $\lfloor x \rfloor$ is the greatest integer less than function
+(the Matlab \texttt{floor} function).  This means that $\mu(k)$ is
+given by
+\[
+  \mu(k) =  \frac{kT_{s} + \tau}{T_{}} - m(k)
+\]
+
+\Example{Calculation Example}  Let $T_{s}/T_{} = 3.1$ and
+$\tau/T_{} = 1.8$.  Calculate $(m(k), \mu(k))$ for $k=1, 2, 3$.
+
+\Solution{
+\begin{eqnarray}
+  m(1) = \lfloor 3.1 + 1.8 \rfloor = 4;  & \quad & \mu(1) = 0.9
+   \nonumber \\
+  m(2) = \lfloor 2(3.1) + 1.8 \rfloor = 8;  & \quad & \mu(1) = 0
+   \nonumber \\
+  m(3) = \lfloor 3(3.1) + 1.8 \rfloor = 11;  & \quad & \mu(1) = 0.1
+   \nonumber
+\end{eqnarray}
+Thus your interpolation will be done: in between samples 4 and 5; at
+sample 8; and in between samples 11 and 12. }
+
+\subsection{Seeing Interpolation as Filtering}
+
+Consider the output of the matched filter, $r(t)$ as given in
+(\ref{E:RxSignalDelay}). The analog output of the matched filter
+could be represented as a function of its samples $r(nT_{})$,
+\begin{equation} \label{E:ctsTimeSampledSignal}
+  r(t) = \sum_n r(nT_{}) h_I(t-nT_{})
+\end{equation}
+where
+\[
+  h_I(t) = \frac{\sin(\pi t/T_{})}{\pi t/T_{}}.
+\]
+Why is this so?  What are the conditions necessary for this
+representation to be accurate?
+
+Answer: Read again the Nyquist sampling theorem from Lecture 4.  As I said then, the Nyquist sampling theorem is an interpolation method.
+
+If we wanted the signal at the correct sampling times, we could have
+it -- we just need to calculate $r(t)$ at another set of times (not
+$nT_{}$).
+
+Call the correct symbol sampling times as $t = kT_{s} + \tau$ for
+integer $k$, where $T_{s}$ is the actual symbol period used by the
+transmitter. Plugging these times in for $t$ in
+(\ref{E:ctsTimeSampledSignal}), we have that
+\[
+  r(kT_{s}+ \tau) = \sum_n r(nT_{}) h_I(kT_{s}+ \tau -nT_{})
+\]
+Now, using the $(m(k), \mu(k))$ notation, since $kT_{s} + \tau =
+[m(k) + \mu(k)]T_{}$,
+\[
+  r([m(k) + \mu(k)]T_{}) = \sum_n r(nT_{}) h_I([m(k)-n +
+  \mu(k)]T_{}).
+\]
+Re-indexing with $i=m(k) - n$,
+\begin{equation} \label{E:SeeingInterpAsAFilter}
+  r([m(k) + \mu(k)]T_{}) = \sum_i r([m(k)-i]T_{}) h_I([i +
+  \mu(k)]T_{}).
+\end{equation}
+This is a filter on samples of $r(nT)$, where the filter
+coefficients are dependent on $\mu(k)$.
+
+Note:  Good illustrations are given in M. Rice Section 8.4.2.
+
+\subsection{Approximate Interpolation Filters}
+
+Clearly, (\ref{E:SeeingInterpAsAFilter}) is a filter.  The desired
+sample at $[m(k) + \mu(k)]T_{}$ is calculated by adding the
+weighted contribution from the signal at each sampling time.  The
+problem is that in general, this requires an infinite sum over $i$
+from $-\infty$ to $\infty$, because the sinc function has infinite
+support.
+
+Instead, we use polynomial approximations for $h_I(t)$:
+\begin{itemize}
+  \item  The easiest
+    one we're all familiar with is linear interpolation (a first-order
+    polynomial), in which we draw a straight line between the two
+    nearest sampled values to approximate the values of the continuous
+    signal between the samples. This isn't so great of an approximation.
+  \item A second-order polynomial (\ie, a parabola) is actually a
+    very good approximation.  Given three points, one can determine a
+    parabola that fits those three points exactly.
+  \item However, the three point fit does \emph{not} result in a
+    linear-phase filter.  (To see this, note in the time domain that
+    two samples are on one side of the interpolation point, and one on
+    the other.  This is temporal asymmetry.)  Instead, we can use four
+    points to fit a second-order polynomial, and get a linear-phase
+    filter.
+  \item Finally, we could use a cubic interpolation filter.  Four points
+    determine a 3rd order polynomial, and result in a linear filter.
+\end{itemize}
+To see results for different order polynomial filters, see the ``Piecewise Polynomial Interpolation'' sub-section of 8.4.2 in the Rice book.
+
+\subsection{Implementations}
+
+\Note{These polynomial filters are called \emph{Farrow filters} and
+are named after Cecil W.\ Farrow, of AT\&T Bell Labs, 
+who has the US patent (1989) for the
+``Continuously variable digital delay circuit''.  These Farrow
+filters started to be used in the 90's and are now very common due
+to the dominance of digital processing in receivers.}
+
+From (\ref{E:SeeingInterpAsAFilter}), we can see that the filter
+coefficients are a function of $\mu(k)$, the fractional interval.
+Thus we could re-write (\ref{E:SeeingInterpAsAFilter}) as
+\begin{equation} \label{E:SeeingInterpAsAFilter_v2}
+  r([m(k) + \mu(k)]T_{}) = \sum_i r([m(k)-i]T_{}) h_I(i; \mu(k)).
+\end{equation}
+That is, the filter is $h_I(i)$ but its values are a function of
+$\mu(k)$.  The filter coefficients are a polynomial function of
+$\mu(k)$, that is, they are a weighted sum of $\mu(k)^0, \mu(k)^1,
+\mu(k)^2, \ldots, \mu(k)^p$ for a $p$th order polynomial filter.
+
+\Example{First order polynomial interpolation}  For example,
+consider the linear interpolator.
+\[
+  r([m(k) + \mu(k)]T_{}) = \sum_{i=-1}^0 r([m(k)-i]T_{}) h_I(i; \mu(k))
+\]
+What are the filter elements $h_I$ for a linear interpolation
+filter?
+
+\Solution{
+\[
+  r([m(k) + \mu(k)]T_{}) = \mu(k) r([m(k)+1]T_{}) +  [1- \mu(k)] r(m(k)T_{})
+      \nonumber
+\]
+Here we have used $h_I(-1; \mu(k))=\mu(k)$ and $ h_I(0; \mu(k))=1-
+\mu(k)$.}
+
+Essentially, given $\mu(k)$, we form a weighted average of the two
+nearest samples.  As $\mu(k)\rightarrow 1$, we should take the
+$r([m(k)+1]T_{})$ sample exactly.  As $\mu(k)\rightarrow 0$, we
+should take the $r(m(k)T_{})$ sample exactly.
+
+\subsubsection{Higher order polynomial interpolation filters}
+
+In general,
+\[
+  h_I(i; \mu(k)) = \sum_{l=0}^p b_l(i) \mu(k)^l
+\]
+
+A full table of $b_l(i)$ is given in Table 8.1 of the M. Rice
+handout.
+
+Note that the $i$ indices seem backwards.
+
+For the 2nd order Farrow filter, there is an extra degree of freedom
+-- you can select parameter $\alpha$ to be in the range $0 < \alpha
+< 1$.  It has been shown by simulation that $\alpha=0.43$ is best,
+but people tend to use $\alpha = 0.5$ because it is only slightly
+worse, and division by two is extremely easy in digital filters.
+
+\Example{2nd order Farrow filter}  What is the Farrow filter for
+$\alpha = 0.5$ which interpolates exactly half-way between sample
+points?
+
+\Solution{From the problem statement, $\mu = 0.5$.  Since $\mu^2 =
+0.25, \mu = 0.5, \mu^0 = 1$, we can calculate that
+\begin{eqnarray}
+  h_I(-2; 0.5) &=& \alpha \mu^2 - \alpha \mu = 0.125 - 0.25 =  -0.125
+      \nonumber \\
+  h_I(-1; 0.5) &=& -\alpha \mu^2 + (1+\alpha) \mu = -0.125 + 0.75 =  0.625
+      \nonumber \\
+  h_I(0; 0.5) &=& -\alpha \mu^2 + (\alpha-1) \mu + 1 = -0.125 - 0.25 + 1 =  0.625
+      \nonumber \\
+  h_I(1; 0.5) &=& \alpha \mu^2 - \alpha \mu = 0.125 - 0.25 =  -0.125
+      \nonumber \\
+\end{eqnarray}
+}
+
+Does this make sense?  Do the weights add up to 1?  Does it make
+sense to subtract a fraction of the two more distant samples?
+
+
+\Example{Matlab implementation of Farrow Filter}
+
+My implementation is called \texttt{plotFractionalInterpolationEg.m} and is posted on Canvas (along with four associated functions used in the script).  Note I use T\_sa in Matlab to denote the sample period because I felt ``T'' was too ambiguous.  A plot of the result is shown in Figure \ref{F:InterpEg}.
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=4in]{../images/plotFractionalInterpolationEg.eps}}
+  \caption{A BPSK signal is created with SRRC pulses and $\alpha=0.75$ (blue solid line). Samples (red squares) are at $T/T_s = 1/4$.  The optimal symbol sampling times are given by the black vertical lines.  The interpolated value, using a cubic Farrow filter, is given by the height of the vertical black line. }
+  \label{F:InterpEg}
+\end{figure}
+
+\subsection{Review}
+
+Timing synchronization is necessary to know when to sample the
+    matched filter output.  We want to sample at times
+    $[n+\mu]T$, where $n$ is the integer part and $\mu$ is the
+    fractional offset.     Often, we leave out the $T$ and simply talk about the index $n$ or fractional delay $\mu$.
+
+Implementations may be continuous time, discrete time, or a
+    mix.  We focus on the discrete time solutions.
+\begin{itemize}
+  \item Problem:  After matched filter, the samples may be at
+    incorrect times, and in modern discrete-time implementations, there
+    is generally no analog feedback to the ADC to correct when it is sampling.
+  \item Solution:  From samples taken at or above the Nyquist rate,
+    you can interpolate between samples to find the desired sample.
+\end{itemize}
+However this solution leads to new problems:
+\begin{itemize}
+  \item Problem:  True interpolation requires significant
+    calculation -- the sinc filter has infinite impulse response.
+  \item Solution:  Approximate the sinc function with a 2nd or 3rd
+    order polynomial interpolation filter, it works nearly as well.
+\end{itemize}
+\begin{itemize}
+  \item Problem:  How does the receiver know when the correct symbol sampling
+  time should be?
+  \item Solution:  It uses a 'timing locked' loop, analogous to a phased locked loop, which converges to the correct symbol sampling time.  The Rice book covers this in its chapter on symbol synchronization; but we don't cover this in this course.
+\end{itemize}

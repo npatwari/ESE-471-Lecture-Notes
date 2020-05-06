@@ -1,0 +1,186 @@
+\newcommand{\dd}[1]{{\tfrac{\partial}{\partial #1}}}
+\newcommand{\dfd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\dtwod}[1]{\frac{\partial^2}{\partial #1^2}}
+\newcommand{\dtwodd}[2]{\frac{\partial^2}{\partial #1 \partial #2}}
+\newcommand{\dndd}[3]{\frac{\partial^{#3}}{\partial {#1} \cdots \partial {#2}}}
+\newcommand{\dtwofdd}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\Var}[2]{\mbox{Var}_{#1}\left[ {#2} \right]}
+\newcommand{\Cov}[1]{\mbox{Cov}\left( {#1} \right)}
+\newcommand{\E}[2]{E_{#1}\left[ {#2} \right]}
+\newcommand{\I}[1]{\mathrm{I}_{#1}}
+\newcommand{\PR}[1]{P\left[{#1}\right]}
+\newcommand{\RE}[1]{\mathbb{R} \left[{#1}\right]}
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\eg}{{\it e.g.}}
+%\newcommand{\RE}{1}{{\mathbb{Re}\left\{{#1}\right\}}}
+\newcommand{\argmin}[1]{\mathop{\mbox{argmin}}_{#1}}
+\newcommand{\argmax}[1]{\mathop{\mbox{argmax}}_{#1}}
+\newcommand{\argminX}{\argmin{ X: \; X^TX=I_D}}
+\newcommand{\Order}[1]{\mathcal{O}\left( {#1} \right)}
+\newcommand{\ds}[1]{\mathrm{d}{#1}}
+\newcommand{\dv}[1]{\mathrm{d}\Vc{#1}}
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\tr}{\mbox{tr}}
+\newcommand{\me}{\mathrm{e}}
+\newcommand{\mR}{\mathbb{R}}
+\newcommand{\mI}{\mathbb{I}}
+\newcommand{\vone}{\Vc{1}}
+\newcommand{\vzero}{\Vc{0}}
+\newcommand{\vI}{\Vc{I}}
+\newcommand{\vbeta}{\boldsymbol{\beta}}
+\newcommand{\mX}{\mathcal{X}}
+\newcommand{\mY}{\mathcal{Y}}
+\newcommand{\mM}{\mathcal{M}}
+\newcommand{\diag}[1]{{\mbox{diag}\left\{{#1}\right\}}}
+\newcommand{\bb}[0]{\bar{b}}
+\newcommand{\bs}[0]{\bar{\sigma}}
+\newcommand{\mbA}[0]{\mathbf{A}}
+\newcommand{\mbB}[0]{\mathbf{B}}
+\newcommand{\mbC}[0]{\mathbf{C}}
+\newcommand{\mbD}[0]{\mathbf{D}}
+\newcommand{\mbE}[0]{\mathbf{E}}
+\newcommand{\mbF}[0]{\mathbf{F}}
+\newcommand{\mbG}[0]{\mathbf{G}}
+\newcommand{\mbH}[0]{\mathbf{H}}
+\newcommand{\mbI}[0]{\mathbf{I}}
+\newcommand{\mbJ}[0]{\mathbf{J}}
+\newcommand{\mbK}[0]{\mathbf{K}}
+\newcommand{\mbL}[0]{\mathbf{L}}
+\newcommand{\mbM}[0]{\mathbf{M}}
+\newcommand{\mbN}[0]{\mathbf{N}}
+\newcommand{\mbO}[0]{\mathbf{O}}
+\newcommand{\mbP}[0]{\mathbf{P}}
+\newcommand{\mbQ}[0]{\mathbf{Q}}
+\newcommand{\mbR}[0]{\mathbf{R}}
+\newcommand{\mbS}[0]{\mathbf{S}}
+\newcommand{\mbT}[0]{\mathbf{T}}
+\newcommand{\mbU}[0]{\mathbf{U}}
+\newcommand{\mbV}[0]{\mathbf{V}}
+\newcommand{\mbW}[0]{\mathbf{W}}
+\newcommand{\mbX}[0]{\mathbf{X}}
+\newcommand{\mbY}[0]{\mathbf{Y}}
+\newcommand{\mbZ}[0]{\mathbf{Z}}
+\newcommand{\mba}[0]{\mathbf{a}}
+\newcommand{\mbb}[0]{\mathbf{b}}
+\newcommand{\mbc}[0]{\mathbf{c}}
+\newcommand{\mbd}[0]{\mathbf{d}}
+\newcommand{\mbe}[0]{\mathbf{e}}
+\newcommand{\mbf}[0]{\mathbf{f}}
+\newcommand{\mbg}[0]{\mathbf{g}}
+\newcommand{\mbh}[0]{\mathbf{h}}
+\newcommand{\mbi}[0]{\mathbf{i}}
+\newcommand{\mbj}[0]{\mathbf{j}}
+\newcommand{\mbk}[0]{\mathbf{k}}
+\newcommand{\mbl}[0]{\mathbf{l}}
+\newcommand{\mbm}[0]{\mathbf{m}}
+\newcommand{\mbn}[0]{\mathbf{n}}
+\newcommand{\mbo}[0]{\mathbf{o}}
+\newcommand{\mbp}[0]{\mathbf{p}}
+\newcommand{\mbq}[0]{\mathbf{q}}
+\newcommand{\mbr}[0]{\mathbf{r}}
+\newcommand{\mbs}[0]{\mathbf{s}}
+\newcommand{\mbt}[0]{\mathbf{t}}
+\newcommand{\mbu}[0]{\mathbf{u}}
+\newcommand{\mbv}[0]{\mathbf{v}}
+\newcommand{\mbtv}[0]{\mathbf{\tilde{v}}}
+\newcommand{\mbw}[0]{\mathbf{w}}
+\newcommand{\mbx}[0]{\mathbf{x}}
+\newcommand{\mby}[0]{\mathbf{y}}
+\newcommand{\mbty}[0]{\mathbf{\tilde{y}}}
+\newcommand{\mbz}[0]{\mathbf{z}}
+\newcommand{\mbzero}[0]{\mathbf{0}}
+\newcommand{\mbalpha}[0]{{\boldsymbol{\alpha}}}
+\newcommand{\mbdelta}[0]{{\boldsymbol{\delta}}}
+\newcommand{\mbepsilon}[0]{{\boldsymbol{\epsilon}}}
+\newcommand{\mbmu}[0]{{\boldsymbol{\mu}}}
+\newcommand{\mbPi}[0]{{\boldsymbol{\Pi}}}
+\newcommand{\mbpi}[0]{{\boldsymbol{\pi}}}
+\newcommand{\mbtheta}[0]{{\boldsymbol{\theta}}}
+\newcommand{\mbphi}[0]{{\boldsymbol{\phi}}}
+
+
+\newcommand{\Definition}[2]{\vspace{0.1in} \noindent    {\begin{minipage}{\linewidth}\underline{\bf Def'n:}  {\it #1}\\
+#2\end{minipage}}\vspace{0.1in} \\ }
+\newcommand{\Lemma}[2]{\vspace{0.1in}\\ \noindent  {\begin{minipage}{\linewidth}\underline{\bf Lemma:}  {#1}\\
+{\bf Proof:} #2 \end{minipage}}\vspace{0.1in} \\ }
+\newcommand{\Theorem}[2]{\vspace{0.1in} \noindent \begin{minipage}{\linewidth}\underline{\bf Theorem:}
+{#1} \\ {\bf Proof:} {#2} \end{minipage}\vspace{0.1in} \\ }
+\newcommand{\StartOf}[1]{{\noindent \rule{\linewidth}{1pt}\\ \noindent \large \bf #1}\\}
+\newcommand{\Today}[1]{{\noindent \large Today: #1}\\}
+\newcommand{\Example}[1]{{\vspace{0.15in} \noindent \bf Example: #1}\\}
+\newcommand{\Note}[1]{{\vspace{0.05in} \noindent {\bf Note:} #1}\\}
+\newcommand{\IF}[1]{\,\,\,\, \mbox{if} \,\,\, #1}
+\newcommand{\pdfarray}[2]{{ \left\{\begin{array}{ll} {#1}, & {#2} \\ 0, & o.w. \end{array}\right. }}
+\newcommand{\pdfarrays}[4]{{ \left\{\begin{array}{ll} {#1}, & {#2} \\ {#3}, & {#4} \\ 0, & o.w. \end{array}\right. }}
+\newcommand{\twooptions}[4]{{ \left\{\begin{array}{ll} {#1}, & {#2} \\ {#3}, & {#4} \end{array}\right. }}
+\newcommand{\CDFarrays}[4]{{ \left\{\begin{array}{ll}
+   0,    & {#3} < {#2} \\
+   {#1}, & {#2} \le {#3} < {#4} \\
+   1, & {#3} \ge {#4} \end{array}\right. }}
+\newcommand{\CDFarray}[3]{{ \left\{\begin{array}{ll}
+   0,    & {#3} < {#2} \\
+   {#1}, & {#3} \ge {#2} \end{array}\right. }}
+\newcommand{\CCDFarrays}[4]{{ \left\{\begin{array}{ll}
+   1,    & {#3} < {#2} \\
+   {#1}, & {#2} \le {#3} < {#4} \\
+   0, & {#3} \ge {#4} \end{array}\right. }}
+\newcommand{\CCDFarray}[3]{{ \left\{\begin{array}{ll}
+   1,    & {#3} < {#2} \\
+   {#1}, & {#3} \ge {#2} \end{array}\right. }}
+\newcommand{\Vector}[1]{\left[ \begin{array}{c} #1 \end{array} \right]}
+\newcommand{\PP}[0]{\vspace{0.11in}\noindent}
+\newcommand{\Fourier}[1]{{\mathfrak{F}\left\{ {#1}\right\}} }
+\newcommand{\IFourier}[1]{{\mathfrak{F}^{-1}\left\{ {#1}\right\}} }
+\newcommand{\Laplace}[1]{{\mathfrak{L}\left\{ {#1}\right\}} }
+\newcommand{\ILaplace}[1]{{\mathfrak{L}^{-1}\left\{ {#1}\right\}} }
+\newcommand{\DTFT}[1]{{\mathrm{DTFT}\left\{ {#1}\right\}} }
+\newcommand{\IDTFT}[1]{{\mathrm{DTFT}^{-1}\left\{ {#1}\right\}} }
+\newcommand{\rect}[0]{\mbox{rect}}
+\newcommand{\sinc}[0]{\mbox{sinc}}
+\newcommand{\Sinc}[1]{\frac{\mbox{sin}\left( \pi \left[ {#1} \right] \right)}{\pi \left[ {#1} \right]} }
+\newcommand{\SINC}[1]{\frac{\mbox{sin}\left(  {#1} \right)}{ {#1} } }
+\newcommand{\Summary}[1]{{\vspace{0.15in} \noindent \bf Summary of today's lecture}: #1\\}
+\newcommand{\rank}[0]{\mbox{rank}}
+\newcommand{\atantwo}[2]{{\mbox{atan2} \left({#1}, {#2} \right) }}
+\newcommand{\erf}[0]{\mbox{erf}}
+\newcommand{\erfc}[0]{\mbox{erfc}}
+\newcommand{\rightflowbox}[1]{\rightarrow\!\!\boxed{{#1}}\!\!\rightarrow}
+
+\newcommand{\En}[0]{\mathcal{E}}
+\newcommand{\Ebno}[0]{\frac{\mathcal{E}_b}{N_0}}
+\newcommand{\Question}[0]{{\vspace{0.15in} \noindent \bf Question:  }}
+\newcommand{\dB}[1]{{#1}\left[\mbox{dB}\right]}
+\newcommand{\dBref}[2]{{#1}\left[\mbox{dB#2}\right]}
+\newcommand{\dBm}[1]{{#1}\left[\mbox{dBm}\right]}
+\newcommand{\dBW}[1]{{#1}\left[ \mbox{dBW} \right]}
+\newcommand{\Span}[1]{\mbox{Span} \{ \mathcal{#1} \}   }
+\newcommand{\intinfty}[2]{{\int_{#1 = -\infty}^{\infty} #2  d{#1} }}
+\newcommand{\decision}[2]{{{#1 \atop >} \atop {< \atop #2}}}
+\newcommand{\Q}[1]{{\mbox{Q}\left( {#1} \right)}}
+\newcommand{\Qinv}[1]{{\mbox{Q}^{-1}\left( {#1} \right)}}
+\newcommand{\sgn}[1]{{\mbox{sgn}\left\{ {#1} \right\}}}
+\newcommand{\entropy}[1]{H\left[ {#1} \right]}
+\newcommand{\stdPM}[0]{(P,\mathcal{F}, \Omega)}
+\newcommand{\apriori}[0]{\emph{a priori} }
+\newcommand{\nnn}[0]{\nonumber \\ }
+\newcommand{\nn}[0]{\nonumber }
+\newcommand{\sifi}[0]{$\sigma$-field}
+\newcommand{\communicateswith}[0]{{\leftrightarrow }}
+\newcommand{\MatTwoCols}[1]{\left[ \begin{array}{cc} #1 \end{array} \right]}
+\newcommand{\MatThreeCols}[1]{\left[ \begin{array}{ccc} #1 \end{array} \right]}
+\newcommand{\MatFourCols}[1]{\left[ \begin{array}{cccc} #1 \end{array} \right]}
+\newcommand{\MatFiveCols}[1]{\left[ \begin{array}{ccccc} #1 \end{array} \right]}
+\newcommand{\MatSixCols}[1]{\left[ \begin{array}{cccccc} #1 \end{array} \right]}
+\newcommand{\MatSevenCols}[1]{\left[ \begin{array}{ccccccc} #1 \end{array} \right]}
+\newcommand{\MatEightCols}[1]{\left[ \begin{array}{cccccccc} #1 \end{array} \right]}
+\newcommand{\MatNineCols}[1]{\left[ \begin{array}{ccccccccc} #1 \end{array} \right]}
+\newcommand{\MatTenCols}[1]{\left[ \begin{array}{cccccccccc} #1 \end{array} \right]}
+\newcommand{\MatElevenCols}[1]{\left[ \begin{array}{ccccccccccc} #1 \end{array} \right]}
+\newcommand{\limin}[1]{\lim_{{#1}\rightarrow \infty}}
+\newcommand{\ep}[1]{{\times 10^{{#1}}}}
+\newcommand{\logten}[0]{{\log_{10}}}
+\newcommand{\arrowunder}[1]{\mathop{\rightarrow}^{#1}}
+\newcommand{\Combinations}[2]{\left( \begin{array}{c} {#1} \\ {#2} \end{array} \right)}
+\newcommand{\PRgiven}[2]{P\left[{#1} \, | \, {#2} \right]}
+
+\newcommand{\ThisSemester}[0]{Spring 2020}

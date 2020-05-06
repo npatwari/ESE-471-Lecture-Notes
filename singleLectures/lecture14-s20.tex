@@ -1,0 +1,338 @@
+\StartOf{Lecture 14}
+
+\Today{Probability of Error (1) QAM / PSK  examples, (2) FSK, (3) Differential PSK}
+
+
+\subsection{QAM/PSK Probability of Error Examples}
+\Example{Probability of Error in $M$-PSK}
+
+Find the probability of error in $M$-ary PSK using the nearest neighbor approximation.  Is this the same as the union bound?
+
+\vspace{0.1in}
+\Solution{
+Here the distance between two neighboring symbols can be calculated by seeing the origin and the two symbol points as forming an isosceles triangle with top angle $2\pi/M$, and equal sides having length $A$.  Thus the length of the base is $d_{min} = 2A\sin \frac{2\pi}{2M}$.  The squared distance is
+\[
+d_{min}^2 = 4A^2 \sin^2 (\pi/M)
+\]
+
+The average energy per symbol is simply $A^2$ because all of the symbol points are $A$ from the origin.  Thus the average energy per bit is $\En_b = A^2 / \log_2 M$.  Thus $A^2 = \En_b \log_2 M$.  So:
+\[
+d_{min}^2 = 4\En_b (\log_2 M ) \sin^2 (\pi/M)
+\]
+
+Using the expression for the nearest neighbor approximation:
+\begin{eqnarray} \label{E:MPSK_Perror_approx}
+  \PR{\mbox{symbol error}} &\approx & \frac{N_{min}}{M}  \Q{\sqrt{\frac{d^2_{min}}{2N_0}}} \nnn
+  &\approx& \frac{2M}{M} \Q{\sqrt{4 (\log_2 M)\sin^2 ( \pi/M ) \frac{\En_b }{2N_0}}} \nnn
+    &\approx& 2 \Q{\sqrt{2 (\log_2 M)\sin^2 ( \pi/M ) \frac{\En_b }{N_0}}} \nn
+\end{eqnarray}
+
+This is the same as the union bound because each symbol only has two neighbors (symbols that contribute to the decision boundary). 
+}
+
+The Rice book, Section 6.2, page 319-321, derives an approximate formula for the probability of error in $M$-PSK for $M>4$.  (Recall QPSK has an exact solution.)  For $M>4$, the book shows how to use a polar transformation and approximate the probability of error integral.  The solution is exactly the same, in the end, as the nearest neighbor approximation / union bound expression in (\ref{E:MPSK_Perror_approx}).  
+
+
+
+
+\Example{Additional QAM / PSK Constellations}
+
+Solve for the probability of symbol error in the completely made up signal space diagrams in
+Figure \ref{F:exampleQAM-PSK-diagrams}.  You should calculate:
+\begin{itemize}
+  \item An exact expression if one should happen to be available,
+  \item The union bound,
+  \item The nearest-neighbor approximation.
+\end{itemize}
+Solve for the probability of symbol error first, and next the probability of
+bit error.  Figure \ref{F:exampleQAM-PSK-diagrams} is in terms of amplitude $A$, but all
+probability of error expressions should be written in terms of
+$\En_b/N_0$.
+
+\begin{figure}[htbp]
+  \includegraphics[width=0.9\textwidth]{../images/EgQAM_v2.eps}
+  \caption{Constellation diagram for some example (made up) modulations.
+  \label{F:exampleQAM-PSK-diagrams}}
+\end{figure}
+\begin{figure}[htbp]
+  \includegraphics[width=1.0\textwidth]{../images/cross_mqam_8_32_64.png}
+  \caption{Constellation diagrams for Cross M-QAM for (left) $M=8$, (center) $M=32$, and (right) $M=64$, from Rice Figure 5.3.4.
+  \label{F:exampleCrossQAM}}
+\end{figure}
+
+\Example{2 by 4 grid QAM}
+Solve for the probability of symbol error in the signal space diagrams in
+Rice Figure 5.3.4 (a), copied in these notes as Figure \ref{F:exampleCrossQAM} (left).  You should calculate:
+\begin{itemize}
+  \item An exact expression,
+  \item The union bound,
+  \item The nearest-neighbor approximation.
+\end{itemize}
+
+\Solution{(a) An exact expression is possible because the decision is separable.  That is, the $x_0$ will decide two of the three bits, while $x_1$ will decide the third bit.  Assume that nearest neighbors are separated by 2A.  For the third bit, the probability of error is that of bipolar PAM, that is, $\Q{\sqrt{\frac{2 A^2}{N_0}}}$.  For the first two bits, the probability of bit error is approximately (assuming Gray coding),
+\[
+\frac{1}{\log_2 M} \frac{2(M-1)}{M} \Q{\sqrt{\frac{2 A^2}{N_0}}} =  \frac{3}{4} \Q{\sqrt{\frac{2 A^2}{N_0}}}  
+\]
+The overall average probability of error will be a weighted average of these two -- 2/3 times the probability of bit error in the first two bits and 1/3 times the probability of bit error in the third bit,
+\[
+ \PR{\mbox{bit error}} \approx \left[ \frac{2}{3}\frac{3}{4}+ \frac{1}{3}\right] \Q{\sqrt{\frac{2 A^2}{N_0}}} = \frac{5}{6}\Q{\sqrt{\frac{2 A^2}{N_0}}}
+\]
+The average bit energy is 
+\begin{eqnarray}
+ \En_b &=& \frac{1}{\log_2 8} \En_s\\
+ &=& \frac{1}{\log_2 8} \frac{1}{8}\left[ 4(2A^2) + 4*(A^2 + 9A^2)\right] = 2A^2
+\end{eqnarray}
+Thus 
+\[
+ \PR{\mbox{bit error}} = \frac{5}{6}\Q{\sqrt{\frac{\En_b}{ N_0}}}
+\]
+
+The union bound for (a) and the nearest neighbor approximation are the same.  All nearest neighbors are separated by distance 2A.  Four nodes have two neighbors, and four nodes have three neighbors.  So $N_{min} = 20$, and $d_{min}=2A$. 
+So,
+\begin{eqnarray} 
+  \PR{\mbox{symbol error}}  &\le & \frac{20}{8} \Q{\sqrt{\frac{4A^2}{2N_0}}} = 2.5 \Q{\sqrt{\frac{\En_b}{N_0}}} \nonumber
+\end{eqnarray}
+Note that this results in an approximate bit error rate of $\frac{5}{6} \Q{\sqrt{\frac{\En_b}{N_0}}}$, the same expression as above.}
+
+\Example{Cross $M=32$ QAM}
+Solve for the probability of symbol error in the signal space diagrams in
+Rice Figure 5.3.4 (b), copied to these notes as Figure \ref{F:exampleCrossQAM} (center).  You should calculate:
+\begin{itemize}
+  \item The union bound, and
+  \item The nearest-neighbor approximation.
+\end{itemize}
+
+\Solution{
+The union bound requires us to count neighbors. Assume all nearest neighbors are separated by distance 2A.  
+\begin{enumerate}
+ \item Sixteen nodes (the center 4x4 grid) have four neighbors at distance $2A$,
+ \item Eight nodes have three neighbors at distance $2A$,
+ \item Eight nodes have two neighbors at distance $2A$ and one neighbor at distance $2\sqrt{2}A$.  
+\end{enumerate}
+Also, the average symbol energy is $\frac{1}{32}$ times twice the sum of the squared x-coordinates because of the symmetry of the constellation.
+\[
+ \En_s = \frac{2(12A^2 + 12(9A^2) + 8(25A^2))}{32} = 20A^2
+\]
+Since $\log_2 M = 5$, we have $\En_b = \frac{\En_s}{5}  =  4A^2$.
+\begin{eqnarray} 
+  \PR{\mbox{symbol error}}  &\le & \frac{1}{32} \left\{ (16(4)+8(3)+8(2)) \Q{\sqrt{\frac{4A^2}{2N_0}}} + 8\Q{\sqrt{\frac{8A^2}{2N_0}}} \right\} \nnn
+  &\le& \frac{13}{4}\Q{\sqrt{\frac{\En_b}{2 N_0}}} + \frac{1}{4}\Q{\sqrt{\frac{\En_b}{N_0}}}
+\end{eqnarray}
+The nearest neighbor approximation would simply remove the second term and replace the $\le$ with an $\approx$.
+}
+
+
+
+
+
+\section{FSK Probability of Error}
+
+\subsection{Probability of Error for Coherent Binary FSK}
+
+First, let's look at coherent detection of binary FSK.
+\begin{enumerate}
+ \item What is the detection threshold line separating the two decision
+regions?
+ \item What is the distance between points in the Binary FSK signal space?
+\end{enumerate}
+What is the probability of error for coherent binary FSK?  It
+is the same as bipolar PAM, but the symbols are spaced differently (more closely) as a function of $\En_b$.  We had that
+\[
+\PR{\mbox{error}}_{2-ary} = \Q{\sqrt{\frac{d_{0,1}^2}{2N_0}}}
+\]
+Now, the spacing between symbols has reduced by a factor of $\sqrt{2}/2$ compared to bipolar PAM, to $d_{0,1} = \sqrt{2\En_b}$.  So
+\[
+\PR{\mbox{error}}_{2-Co-FSK} = \Q{\sqrt{\frac{\En_b}{N_0}}}
+\]
+For the same probability of bit error, binary FSK is about 1.5 dB better than OOK (requires 1.5 dB less energy per bit), but 1.5 dB worse than bipolar PAM (requires 1.5 dB more energy per bit).
+
+
+\begin{figure}[htbp]
+  (a) \input{images/fsk_coherent_rx}
+  
+  (b) \input{images/fsk_noncoherent_rx}
+  
+  \caption{Block diagram of receivers for binary FSK. (a) A coherent RX synchronizes to the phases $\phi_0$, $\phi_1$ of the cosines at each frequency $\omega_0$, $\omega_1$, correlates with the two possible waveforms, and then decides which of the two symbols is closest.  (b) A non-coherent RX does not try to estimate the phases, and instead, correlates with a cosine and a sine at each frequency $\omega_0$ and $\omega_1$, computes the energy in band $m$ as $r_{mc}^2 + r_{ms}^2$, and finds which one has the highest energy.
+  \label{F:FSK_block_diagrams}}
+\end{figure}
+
+\subsection{Probability of Error for Noncoherent Binary FSK}
+
+The energy detector uses the energy in each frequency and selects the frequency with maximum energy.
+
+This energy is denoted $r_m^2$ for frequency $m\in \{0,1\}$ and is
+\[
+ r_m^2 = r_{mc}^2 + r_{ms}^2
+\]
+This energy measure is a statistic which measures how much energy
+was in the signal at frequency $f_m$.  The `envelope' is a term used
+for the square root of the energy, so $r_m$ is termed the envelope.
+
+Question: What will $r_m^2$ equal when the noise is very small?
+
+As it turns out, given the non-coherent receiver and $r_{mc}$ and
+$r_{ms}$, the envelope $r_m$ is an optimum (sufficient) statistic to
+use to decide between $s_0 \ldots s_{M-1}$.
+
+What do they do to prove this in Proakis \& Salehi?  They prove it for
+\emph{binary} non-coherent FSK.  It takes quite a bit to do
+this proof; one needs to have some practice in transformations of random variables.  A sketch:
+\begin{enumerate}
+ \item Define the received vector $\mbr$ as a $4$ length vector of
+   the correlation of $r(t)$ with the sin and cos at each frequency $f_0, f_1$.
+ \item They formulate the prior probabilities $f_{\mbr | H_i}(\mbr | H_i)$.  Note that
+   this depends on $\theta_m$, which is assumed to be uniform between
+   $0$ and $2\pi$, and independent of the noise.
+   \begin{eqnarray}
+     f_{\mbr | H_i}(\mbr | H_i) &=& \int_0^{2\pi} f_{\mbr,\theta_m | H_i}(\mbr,\phi |
+     H_i) d\phi \nonumber \\
+         &=& \int_0^{2\pi} f_{\mbr | \theta_m, H_i}(\mbr | \phi, H_i) f_{\theta_m|H_i}(\phi | H_i) d\phi \nonumber \\
+   \end{eqnarray}
+   Note that $f_{\mbr |  \theta_m, H_0}(\mbr | \phi, H_0)$ is a 2-D Gaussian random vector with i.i.d. components.
+ \item They formulate the joint probabilities $f_{\mbr \cap H_0}(\mbr \cap H_0)$
+   and $f_{\mbr \cap H_1}(\mbr \cap H_1)$.
+ \item Where the joint probability $f_{\mbr \cap H_0}(\mbr \cap H_0)$ is
+   greater than $f_{\mbr| H_1}(\mbr | H_1)$, the receiver decides
+   $H_0$.  Otherwise, it decides $H_1$.
+ \item The decisions in this last step, after manipulation of the
+   pdfs, are shown to reduce to this decision (given that $\PR{H_0} =
+   \PR{H_1}$):
+   \[
+     \sqrt{r_{0c}^2 + r_{0s}^2} \decision{H_0}{H_1} \sqrt{r_{1c}^2 + r_{1s}^2}
+   \]
+\end{enumerate}
+The ``envelope detector'' can equally well be called the ``energy
+detector'', and it often is.  The full proof of the probability of error is in Proakis \& Salehi, Section 7.6.9, page 430 (which is posted on Canvas).  The expression for probability of error in binary non-coherent FSK is given by,
+\begin{equation} \label{E:2-nc-fsk}
+ \PR{\mbox{error}}_{2-NC-FSK} = \frac{1}{2} \exp \left[- \frac{\En_b}{2N_0} \right]
+\end{equation}
+The expressions for probability of error in binary FSK (both coherent and non-coherent) are important, and you should make note of them.  You will use them to be able to design communication systems that use FSK.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Differential Coding for BPSK}
+
+
+%The bandpass signal for PSK is,
+%\[
+%  s(t) = \cos(2\pi f_c t + \angle \mba_k(t)).
+%\]
+%for $k=0\ldots M-1$.
+%
+%
+\Definition{Coherent Reception}{The reception of a signal when its
+carrier phase is explicitly determined and used for demodulation.}
+
+For coherent reception of PSK, will always need some kind of phase
+synchronization in BPSK.   Typically, this means transmitting a
+training sequence.
+
+For non-coherent reception of PSK, we use differential encoding (at
+the transmitter) and decoding (at the receiver).
+
+\subsection{DPSK Transmitter}
+
+Now, consider the bit sequence $\{b_n\}$, where $b_n$ is the $n$th
+bit that we want to send.  The sequence $b_n$ is a sequence of 0's
+and 1's. How do we decide which phase to send? Prior to this, we've
+said, send $\mba_0$ if $b_n=0$, and send $\mba_1$ if $b_n = 1$.
+
+Instead of setting $k$ for $\mba_k$ only as a function of $b_n$, in
+differential encoding, we also include $k_{n-1}$.  Now,
+\[
+ k_n = \twooptions{k_{n-1}}{b_n=0}{1-k_{n-1}}{b_n=1}
+\]
+Note that $1-k_{n-1}$ is the complement or negation of $k_{n-1}$ --
+if $k_{n-1}=1$ then $1-k_{n-1}=0$; if $k_{n-1}=0$ then
+$1-k_{n-1}=1$. Basically, for differential BPSK, a switch in the
+angle of the signal space vector from $0^o$ to $180^o$ or vice versa
+indicates a bit 1; while staying at the same angle indicates a bit
+0.
+
+Note that the TX and RX have to agree on the ``zero'' phase.  Typically
+$k_{0}=0$.  This becomes an \emph{extra} bit sent with the data bits.
+
+\Example{Differential encoding}
+
+Let $\mbb = [1, 0, 1, 0, 1, 1, 1, 0, 0 ]$.  Assume $b_0=0$.
+ What symbols $\mbk = [ k_0, \ldots, k_9]^T$ will be sent?
+\Solution{
+\[
+\mbk = [0, 1, 1, 0, 0,  1, 0, 1, 1, 1]^T
+\]
+These values of $k_n$ correspond to a symbol stream with phases:
+\[
+\angle \mba = [0, \pi, \pi, 0, 0,  \pi, 0, \pi, \pi, \pi]^T
+\]
+
+}
+
+\subsection{DPSK Receiver}
+
+Now, at the receiver, we
+find $b_n$ by comparing the phase of $x_{n}$ to the phase of $x_{n-1}$.  
+What our receiver does, is to measure the angle difference is small (close to zero) or large (bigger than $\pi/2$)
+\[
+   \cos (\angle x_n - \angle x_{n-1})
+\]
+If this statistic is less than zero, decide $b_n=1$, and if
+it is greater than zero, decide $b_n=0$.
+
+
+\Example{Differential decoding}
+\begin{enumerate}
+\item Assuming no phase shift in the above encoding example, show that the receiver
+will decode the original bitstream with differential decoding.
+\Solution{Starting with the 2nd element of $\angle \mba$ above,
+\[
+\hat{b}_n = [1, 0, 1, 0, 1, 1, 1, 0, 0 ]^T.
+\]
+}
+ \item Now, assume that all bits are shifted $\pi$ radians and we
+ receive
+\[
+\angle \mbx'   = [\pi, 0, 0, \pi, \pi,  0, \pi, 0, 0, 0].
+\]
+ What will be decoded at the receiver?
+\Solution{
+\[
+\hat{b}_n = [1, 0, 1,   0,    1,   1, 1, 0, 0 ].
+\]
+}
+\end{enumerate}
+Rotating \emph{all} symbols by $\pi$ radians does not cause any bit error.
+
+\subsection{Probability of Bit Error for DPSK}
+
+The probability of bit error in DPSK is slightly worse than that for BPSK:
+
+\[
+ \PR{\mbox{error}} = \frac{1}{2} \exp\left( -\Ebno \right) 
+\]
+
+For a constant probability of error, DPSK requires about 1 dB more $\Ebno$ than BPSK, which has probability of bit error $\Q{\sqrt{\frac{2\En_b}{N_0}}}$.  Both are plotted in Figure \ref{F:bpsk_vs_dpsk}.
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=0.65\textwidth]{../images/plotPbiterror_DPSK.eps}}
+  \caption{Comparison of probability of bit error for BPSK and Differential BPSK.}
+  \label{F:bpsk_vs_dpsk}
+\end{figure}
+

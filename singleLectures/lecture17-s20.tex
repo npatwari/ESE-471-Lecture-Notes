@@ -1,0 +1,136 @@
+\StartOf{Lecture 17}
+
+\Today{(1) Link Budgeting}
+
+\announcements{
+\begin{itemize}
+  \item Today's reading: Rice 6.4.  
+\end{itemize}
+}
+
+
+\section{Link Budgeting}
+
+The idea of this section is that system designs are not always straightforward solutions of the equations we have.  We may have constraints that are difficult to simultaneously meet, for example, on bandwidth and power.  To meet all constraints, we may need to be more restrictive than the constraint on one parameter in order to exactly meet the constraint on another.
+
+\subsection{Bandwidth and Energy Limited Channels}
+
+Assume the $C/N_0$, the maximum bandwidth, and the maximum BER are all given.  
+Sometimes power is the limiting factor in determining the maximum
+achievable bit rate. Such links (or channels) are called \emph{power
+limited} channels. Sometimes bandwidth is the limiting factor in
+determining the maximum achievable bit rate. In this case, the link
+(or channel) is called a \emph{bandwidth limited} channel.  You just
+need to try to solve the problem and see which one limits your
+system.
+
+Here is a step-by-step version of what you might need do in this case:
+
+\textbf{Method A: Start with power-limited assumption:}
+\begin{enumerate}
+  \item Use the probability of error constraint to determine the
+    $\Ebno$ constraint, given the appropriate probability of error
+    formula for the modulation.
+  \item Given the $C/N_0$ constraint and the $\Ebno$ constraint,
+    find the maximum bit rate.  Note that $R_b = 1/T_b = \frac{C/N_0}{\Ebno}$,
+    but be sure to express both in linear units.
+  \item Given a maximum bit rate, calculate the maximum symbol rate
+    $R_s = \frac{R_b}{\log_2 M}$ and then compute the required bandwidth
+    using the appropriate bandwidth formula.
+  \item  Compare the bandwidth at maximum $R_s$ to the bandwidth
+    constraint:  If BW at $R_s$ is too high, then the system is
+    bandwidth limited; reduce your bit rate to conform to the BW constraint.
+    Otherwise, your system is power limited, and your $R_b$ is
+    achievable.
+\end{enumerate}
+
+\textbf{Method B: Start with a bandwidth-limited assumption:
+}\begin{enumerate}
+  \item Use the bandwidth constraint and the appropriate bandwidth formula to find the maximum symbol
+    rate $R_s$ and then the maximum bit rate $R_b$.
+  \item Find the $\Ebno$ at the given bit rate by computing $\Ebno = \frac{C/N_0}{R_b}$.
+    (Again, make sure that everything is in linear units.)
+  \item Find the probability of error at that $\Ebno$, using  the appropriate probability of error
+    formula.
+  \item If the computed $\PR{\mbox{error}}$ is greater than the BER
+    constraint, then your system is power limited.  Use the previous
+    method to find the maximum bit rate.  Otherwise, your system is
+    bandwidth-limited, and you have found the correct maximum bit rate.
+\end{enumerate}
+
+
+\Example{Rice 6.33}
+
+Consider a bandpass communications link with a bandwidth of 1.5 MHz and with an available $C/N_0 = 82$ dB Hz. The maximum bit error rate is $10^{-6}$.
+\begin{enumerate}
+  \item If the modulation is 16-PSK using the SRRC pulse shape with $\alpha = 0.5$, what is the maximum achievable bit rate on the link? Is this a power limited or bandwidth limited channel?
+  \item If the modulation is square 16-QAM using the SRRC pulse shape with $\alpha = 0.5$, what is the maximum achievable bit rate on this link? Is this a power limited or bandwidth limited channel?
+\end{enumerate}
+
+\Solution{
+\begin{enumerate}
+  \item Try Method A.  For $M=16$ PSK, we can find $\Ebno$ for the maximum BER:
+\begin{eqnarray}
+ 10^{-6} &=& \PR{\mbox{error}} = \frac{2}{\log_2 M} \Q{\sqrt{2(\log_2 M)\sin^2(\pi/M) \frac{\En_b }{N_0}}}
+   \nnn
+ 10^{-6} &=& \frac{2}{4} \Q{\sqrt{2(4) \sin^2(\pi/16)  \frac{\En_b }{N_0}}}
+   \nnn
+ \frac{\En_b }{N_0} &=& \frac{1}{8 \sin^2(\pi/16)}\left[\Qinv{2\times 10^{-6}}\right]^2
+    \nnn
+ \frac{\En_b }{N_0} &=& 69.84 
+\end{eqnarray}
+Converting $C/N_0$ to linear, $C/N_0 = 10^{82/10} = 1.585\times 10^{8}$.  Solving for $R_b$,
+\[
+  R_b = \frac{C/N_0}{\Ebno} = \frac{1.585\times 10^{8}}{69.84} = 2.27\ep{6} = 2.27 \mbox{ Mbits/s}
+\]
+and thus $R_s= R_b/\log_2 M = 2.27\ep{6}/4 = 5.67\ep{5} \mbox{ Msymbols/s}$.  The required bandwidth for this system is
+\[
+ B_T = \frac{(1+\alpha)R_b}{\log_2 M} = 1.5(2.27\ep{6}) / 4 = 851 \mbox{ kHz}
+\]
+This is clearly lower than the maximum bandwidth of 1.5 MHz.  So, the system is power limited, and can operate with bit rate 2.27 Mbits/s.
+(If $B_T$ had come out $> 1.5$ MHz, we would have needed to reduce $R_b$ to meet the bandwidth limit.)
+%
+  \item Try Method A.  For $M=16$ (square) QAM, we can find $\Ebno$ for the maximum BER:
+\begin{eqnarray}
+ 10^{-6} &=& \PR{\mbox{error}} = \frac{4}{\log_2 M} \frac{(\sqrt{M}-1)}{\sqrt{M}} \Q{\sqrt{\frac{3 \log_2 M}{M-1} \frac{\En_b}{N_0}}}
+   \nnn
+ 10^{-6} &=& \frac{4}{4} \frac{(4-1)}{4} \Q{\sqrt{\frac{3 (4)}{15} \frac{\En_b}{N_0}}}
+   \nnn
+ \frac{\En_b }{N_0} &=& \frac{15}{12}\left[\Qinv{(4/3)\times 10^{-6}}\right]^2
+    \nnn
+ \frac{\En_b }{N_0} &=& 27.55
+\end{eqnarray}
+Solving for $R_b$,
+\[
+  R_b = \frac{C/N_0}{\Ebno} = \frac{1.585\times 10^{8}}{27.55} = 5.75\ep{6} = 5.75 \mbox{ Mbits/s}
+\]
+The required bandwidth for this bit rate is:
+\[
+ B_T = \frac{(1+\alpha)R_b}{\log_2 M} = 1.5(5.75\ep{6}) / 4 = 2.16 \mbox{ MHz}
+\]
+This is greater than the maximum bandwidth of 1.5 MHz, so we must reduce the bit rate to 
+\[
+R_b = \frac{B_T \log_2 M}{1+\alpha} = 1.5 \mbox{ MHz} \frac{4}{1.5} = 4\mbox{ MHz}
+\]
+In summary, we have a bandwidth-limited system with a bit rate of 4 MHz.
+%
+\end{enumerate}
+}
+
+% Part 1 is power limited.  Use method A to see that it can
+% achieve a rate of about 2.27 Mbps.  Part 2 is bandwidth limited.
+% From method B, it is seen that it can achieve a bit rate of 4 Mbps.}
+
+
+\subsection{Link Budget Spreadsheet}
+
+I've shared a Google sheet that I use to calculate probability of error quickly for many different modulations:
+\begin{verbatim}
+    https://bit.ly/LinkBudgetSheet
+\end{verbatim}
+
+On one sheet, you may enter the TX/RX parameters, starting from the right side of the relationship diagram (Figure 1 in Lecture 16), and calculating the bandwidth and probability of bit error.  On the second sheet, you start with the probability of bit error and $C/N_0$ ratio and it calculates the bit rate and bandwidth.
+
+The sheet is linked to from the schedule table on Canvas.  Please save a copy for yourself, modify parameters, and see that the changes go in the direction that you expect.  You may use this to check your answer while doing homework, but please do the calculations yourself so that you have practice.  
+
+If you're interested in how I made the sheet work, please inspect the code I inserted for the $Q()$ function and $Q^{-1}()$ function by going to  Tools:Script Editor; this is handy whenever your function is not a standard spreadsheet function.
